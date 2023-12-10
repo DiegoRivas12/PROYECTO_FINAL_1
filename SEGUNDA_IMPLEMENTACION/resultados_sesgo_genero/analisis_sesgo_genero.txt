@@ -1,0 +1,3 @@
+Femenino: 0
+Masculino: 0
+Desconocido: 2

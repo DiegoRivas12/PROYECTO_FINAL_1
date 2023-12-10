@@ -1,30 +1,31 @@
-import PyPDF2
 import os
+from PyPDF2 import PdfReader
 
-# Directorio que contiene los archivos PDF de las tesis
-directory = 'directorio/de/las/tesis'
+def extract_text_from_pdf(file_path):
+    with open(file_path, 'rb') as file:
+        reader = PdfReader(file)
+        text = ''
+        for page in reader.pages:
+            text += page.extract_text()
+        return text
 
-def extract_text_from_pdf(pdf_file):
-    text = ''
-    with open(pdf_file, 'rb') as file:
-        reader = PyPDF2.PdfFileReader(file)
-        num_pages = reader.numPages
-        for page_num in range(num_pages):
-            page = reader.getPage(page_num)
-            text += page.extractText()
-    return text
-
-def process_thesis_files(directory):
-    thesis_texts = {}
+def process_thesis_files(directory, output_directory):
+    if not os.path.exists(output_directory):
+        os.makedirs(output_directory)
+        
     for filename in os.listdir(directory):
-        if filename.endswith('.pdf'):
+        if filename.endswith(".pdf"):
             file_path = os.path.join(directory, filename)
             text = extract_text_from_pdf(file_path)
-            thesis_texts[filename] = text
-    return thesis_texts
+            # Guardar el texto en un archivo de texto separado
+            text_file_path = os.path.join(output_directory, f"{os.path.splitext(filename)[0]}.txt")
+            with open(text_file_path, "w", encoding="utf-8") as text_file:
+                text_file.write(text)
 
-# Procesar archivos PDF de las tesis en el directorio dado
-thesis_data = process_thesis_files(directory)
+# Directorio que contiene los archivos PDF
+thesis_directory = "tesis"
+# Directorio donde se guardarán los archivos de texto extraídos
+output_folder = "resultados_texto"
 
-# thesis_data contendría un diccionario donde las claves son los nombres de archivo de las tesis
-# y los valores son el texto extraído de los respectivos archivos PDF
+# Procesar los archivos PDF y guardar el texto extraído en archivos de texto en el directorio especificado
+process_thesis_files(thesis_directory, output_folder)
